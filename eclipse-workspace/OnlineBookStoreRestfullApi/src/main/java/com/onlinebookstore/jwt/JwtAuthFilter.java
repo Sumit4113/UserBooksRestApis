@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                user.getUserEmail(),
+                                user.getUserId().toString(),
                                 null,
                                 authorities
                         );
@@ -82,7 +82,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
     	
-    	return request.getRequestURI().startsWith("/api/auth");
+    	System.out.println("PATH: " + request.getRequestURI());
+    	
+    	return request.getRequestURI().startsWith("/auth");
     	
     }
     

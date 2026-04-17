@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 import com.onlinebookstore.entity.AppUser;
 
 @Repository
-
 public interface UserRepository extends JpaRepository<AppUser, UUID> {
 
 	public List<AppUser> findAll();
 
 	public AppUser findByUserEmail(String userEmail);
+
+	public boolean existsByUserEmail(String string);
 
 }

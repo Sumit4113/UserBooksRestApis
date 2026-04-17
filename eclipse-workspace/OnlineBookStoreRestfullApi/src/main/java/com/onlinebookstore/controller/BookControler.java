@@ -22,7 +22,7 @@ import com.onlinebookstore.entity.BookAdd;
 import com.onlinebookstore.service.BookService;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping("/books")
 public class BookControler {
 	
 	
@@ -49,8 +49,8 @@ public class BookControler {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<BookAdd> getBookById(@PathVariable UUID id) {
-	    BookAdd book = bookService.getBookById(id);
+	public ResponseEntity<BookDto> getBookById(@PathVariable UUID id) {
+	    BookDto	 book = bookService.getBookById(id);
 	    return ResponseEntity.ok(book);
 	}
 

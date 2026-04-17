@@ -7,10 +7,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "BooksEntity")
+
 public class BookAdd {
 
 	@Id
@@ -32,11 +34,14 @@ public class BookAdd {
 	@Column
 	private String genre;
 	@Column
+	private String rating;
+	@Lob
+	@Column
 	private String description;
 	@Column
 	private String price;
-
-	
+	@Column
+	private String mode;
 
 	public UUID getBookId() {
 		return bookId;
@@ -116,6 +121,22 @@ public class BookAdd {
 
 	public void setPrice(String price) {
 		this.price = price;
+	}
+
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public String getRating() {
+		return rating;
+	}
+
+	public void setRating(String rating) {
+		this.rating = rating;
 	}
 
 }

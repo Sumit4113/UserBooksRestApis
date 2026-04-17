@@ -50,7 +50,7 @@ public class UserController {
 
 	@GetMapping("/{id}")
 	public UserResponseDTO getById(@PathVariable UUID id) {
-
+  
 		return userService.getUserById(id);
 	}
 

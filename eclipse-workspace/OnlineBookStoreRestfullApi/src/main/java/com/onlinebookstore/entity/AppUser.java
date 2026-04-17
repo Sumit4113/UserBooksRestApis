@@ -10,13 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name ="bookapp_user")
+@Table(name = "bookapp_user")
 public class AppUser {
 
 	@Id
 	@Column
-	// this is used when i provide long data type 
-	//@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// this is used when i provide long data type
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@GeneratedValue
 	private UUID userId;
 	@Column

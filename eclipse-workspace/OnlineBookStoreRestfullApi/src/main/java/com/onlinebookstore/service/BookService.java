@@ -30,7 +30,9 @@ public class BookService {
 		book.setDescription(bookDto.getDescription());
 		book.setGenre(bookDto.getGenre());
 		book.setPrice(bookDto.getPrice());
+		book.setRating(bookDto.getRating());
 		book.setPublisher(bookDto.getPublisher());
+		book.setMode(bookDto.getMode());
 
 		try {
 			// ✅ Upload IMAGE to Cloudinary
@@ -72,19 +74,26 @@ public class BookService {
 
 	}
 
-	public BookAdd getBookById(UUID id) {
-		return bookRepo.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+	public BookDto getBookById(UUID id) {
+	    BookAdd book = bookRepo.findById(id)
+	        .orElseThrow(() -> new RuntimeException("Book not found"));
+
+	    return mapToDto(book);  
 	}
 
 	private BookDto mapToDto(BookAdd bookAdd) {
 		BookDto dto = new BookDto();
-		dto.setBookId(bookAdd.getBookId());
+		dto.setId(bookAdd.getBookId().toString());
 		dto.setTitle(bookAdd.getTitle());
 		dto.setAuthor(bookAdd.getAuthor());
 		dto.setPrice(bookAdd.getPrice());
+		dto.setPublisher(bookAdd.getPublisher());
 		dto.setGenre(bookAdd.getGenre());
 		dto.setBookImage(bookAdd.getBookImage());
-		dto.setPdfUrl(bookAdd.getPdf());
+		dto.setPdf(bookAdd.getPdf());
+		dto.setRating(bookAdd.getRating());
+		dto.setDescription(bookAdd.getDescription());
+		dto.setMode(bookAdd.getMode());
 		return dto;
 	}
 
