@@ -45,7 +45,7 @@ public class SpringConfiguration {
 
 		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
 				.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				// this is for our Controller path protection
+				// this is for Controller path protection
 				.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/auth/login", "/auth/register", "/auth/logout").permitAll()
 				.requestMatchers("/books/**").permitAll()
