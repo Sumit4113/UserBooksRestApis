@@ -1,6 +1,8 @@
 # 📚 Online Bookstore
 
-It's not completed yet , but i worked on that
+It's not completed yet , but i worked on that 
+but i deployed this project like backend on Render and frontend on vercel 
+here is the vercel live - https://onlinebookstorefrontend.vercel.app/
 
 A full-featured online bookstore built using Spring Boot and Thymeleaf. Users can browse books by category, read books after login, and admins can manage book uploads. The platform supports secure login with JWT and OAuth2 authentication.
 
