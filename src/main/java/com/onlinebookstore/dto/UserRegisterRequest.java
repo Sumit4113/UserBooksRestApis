@@ -2,10 +2,18 @@ package com.onlinebookstore.dto;
 
 import java.util.UUID;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class UserRegisterRequest {
 
 	private UUID userId;
+
+	@NotBlank(message = "Username is required")
 	private String userName;
+
+	@Email(message = "Invalid email")
+	@NotBlank(message = "Email is required")
 	private String userEmail;
 	private String userRole;
 	private String userPassword;

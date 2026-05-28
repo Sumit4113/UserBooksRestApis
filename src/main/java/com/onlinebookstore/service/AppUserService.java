@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class AppUserService {
 		AppUser user = new AppUser();
 		user.setUserName(userRegister.getUserName());
 		user.setUserEmail(userRegister.getUserEmail());
-		user.setUserRole(userRegister.getUserRole());
+		user.setUserRole("USER");
 		user.setUserPassword(passwordEncoder.encode(userRegister.getUserPassword()));
 
 		AppUser saved = userRepo.save(user);
@@ -77,50 +78,75 @@ public class AppUserService {
 		return mapToResponse(user);
 	}
 
-//	public UserResponseDTO updateUserByIdSecure(int id, UserRegisterRequest userRequest, String loggedInEmail)
-//			throws AccessDeniedException {
-//
-//		BookUser user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-//
-//		// 🔐 Check if ADMIN
-//		if (!isAdmin(loggedInEmail)) {
-//
-//			// USER can update ONLY their own account
-//			if (!loggedInEmail.equals(user.getUserEmail())) {
-//				throw new AccessDeniedException("You cannot update another user");
-//			}
-//
-//			// USER is NOT allowed to change role or email
-//			user.setUserName(userRequest.getUserName());
-//			user.setUserPassword(userRequest.getUserPassword());
-//
-//		} else {
-//			// ADMIN can update everything
-//			user.setUserName(userRequest.getUserName());
-//			user.setUserEmail(userRequest.getUserEmail());
-//			user.setUserPassword(userRequest.getUserPassword());
-//			user.setUserRole(userRequest.getUserRole());
-//		}
-//
-//		BookUser savedUser = userRepo.save(user);
-//		return mapToResponse(savedUser);
-//	}
-//
-//	private boolean isAdmin(String email) throws AccessDeniedException {
-//		BookUser user = userRepo.findByUserEmail(email);
-//
-//		if (user == null) {
-//			throw new AccessDeniedException("user not found ");
-//		}
-//
-//		return user.getUserRole().equals("ROLE_ADMIN");
-//	}
-//
+	public UserResponseDTO updateUserByIdSecure(UUID id, UserRegisterRequest userRequest, String loggedInEmail)
+			throws AccessDeniedException {
+
+		AppUser user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+		// 🔐 Check if ADMIN
+		if (!isAdmin(loggedInEmail)) {
+
+			// USER can update ONLY their own account
+			if (!loggedInEmail.equals(user.getUserEmail())) {
+				throw new AccessDeniedException("You cannot update another user");
+			}
+
+			// USER is NOT allowed to change role or email
+			user.setUserName(userRequest.getUserName());
+			user.setUserPassword(userRequest.getUserPassword());
+
+		} else {
+			// ADMIN can update everything
+			user.setUserName(userRequest.getUserName());
+			user.setUserEmail(userRequest.getUserEmail());
+			user.setUserPassword(userRequest.getUserPassword());
+			user.setUserRole(userRequest.getUserRole());
+		}
+
+		AppUser savedUser = userRepo.save(user);
+		return mapToResponse(savedUser);
+	}
+
+	private boolean isAdmin(String email) throws AccessDeniedException {
+		AppUser user = userRepo.findByUserEmail(email);
+
+		if (user == null) {
+			throw new AccessDeniedException("user not found ");
+		}
+
+		return user.getUserRole().equals("ROLE_ADMIN");
+	}
+
 	public void deleteUserById(UUID id) {
 
 		AppUser targetUser = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
 		userRepo.delete(targetUser);
+	}
+
+	public UserResponseDTO userUpdate(UUID id, UserRegisterRequest request) {
+
+		AppUser user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+		if (request.getUserName() != null && !request.getUserName().isBlank()) {
+
+			user.setUserName(request.getUserName());
+		}
+
+		if (request.getUserEmail() != null && !request.getUserEmail().isBlank()) {
+
+			user.setUserEmail(request.getUserEmail());
+		}
+
+		if (request.getUserPassword() != null && !request.getUserPassword().isBlank()) {
+
+			user.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
+		}
+
+		AppUser updatedUser = userRepo.save(user);
+
+		return mapToResponse(updatedUser);
+
 	}
 
 	public UserResponseDTO mapToResponse(AppUser user) {

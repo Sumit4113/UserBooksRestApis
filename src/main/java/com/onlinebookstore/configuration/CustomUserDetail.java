@@ -19,7 +19,7 @@ public class CustomUserDetail implements UserDetails {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Autowired
+	
 	private AppUser user;
 
 	public CustomUserDetail(AppUser user) {

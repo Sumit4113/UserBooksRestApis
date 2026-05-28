@@ -1,7 +1,5 @@
 package com.onlinebookstore.service;
 
-
-
 import com.cloudinary.Cloudinary;
 
 import com.cloudinary.utils.ObjectUtils;

@@ -2,7 +2,6 @@ package com.onlinebookstore.controller;
 
 import java.time.Instant;
 
-
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,7 +15,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,6 +40,7 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -70,7 +72,7 @@ public class AuthController {
 
 		Authentication authenticate = authenticate(loginRequest);
 
-		AppUser user = userRepository.findByUserEmail(loginRequest.email());
+		AppUser user = userRepository.findByUserEmail(loginRequest.getUserEmail());
 
 		// this is usefull for admin
 //			if(user.isEnable()) {
@@ -106,8 +108,8 @@ public class AuthController {
 
 		try {
 
-			return authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
+			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+					loginRequest.getUserEmail(), loginRequest.getUserPassword()));
 
 		} catch (Exception e) {
 			throw new BadCredentialsException("Invalid User or Password");
@@ -246,6 +248,15 @@ public class AuthController {
 	public UserResponseDTO register(@RequestBody UserRegisterRequest userRegister) {
 
 		return authService.register(userRegister);
+	}
+
+	@PutMapping("/update/{userId}")
+	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID userId,
+			@Valid @RequestBody UserRegisterRequest request) {
+
+		UserResponseDTO userUpdated = userService.userUpdate(userId, request);
+
+		return ResponseEntity.ok(userUpdated);
 	}
 
 }
