@@ -93,14 +93,14 @@ public class AppUserService {
 
 			// USER is NOT allowed to change role or email
 			user.setUserName(userRequest.getUserName());
-			user.setUserPassword(userRequest.getUserPassword());
+			user.setUserPassword(passwordEncoder.encode(userRequest.getUserPassword()));
 
 		} else {
 			// ADMIN can update everything
 			user.setUserName(userRequest.getUserName());
 			user.setUserEmail(userRequest.getUserEmail());
 			user.setUserPassword(userRequest.getUserPassword());
-			user.setUserRole(userRequest.getUserRole());
+			user.setUserPassword(passwordEncoder.encode(userRequest.getUserPassword()));
 		}
 
 		AppUser savedUser = userRepo.save(user);

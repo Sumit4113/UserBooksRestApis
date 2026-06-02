@@ -1,5 +1,6 @@
 package com.onlinebookstore.entity;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -27,6 +28,19 @@ public class AppUser {
 	private String userPassword;
 	@Column
 	private String userRole;
+	
+	@Column
+    private LocalDateTime createdAt;
+	
+	
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	public UUID getUserId() {
 		return userId;

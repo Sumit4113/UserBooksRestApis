@@ -30,7 +30,7 @@ public class RefreshToken {
 	@Column(name = "jti", unique = true, nullable = false, updatable = false)
 	private String jti;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "userid", nullable = false, updatable = false)
 	private AppUser user;
 

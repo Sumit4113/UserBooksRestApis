@@ -1,4 +1,4 @@
-package com.onlinebookstore.configuration;
+	package com.onlinebookstore.configuration;
 
 import java.util.List;
 
@@ -50,12 +50,13 @@ public class SpringConfiguration {
 				.requestMatchers("/auth/login", "/auth/register", "/auth/logout", "/auth/refresh").permitAll()
 				.requestMatchers("/auth/update/**", "/watchlist/**").hasAuthority("USER")
 				.requestMatchers("/books/**").permitAll()
-				.requestMatchers("/admin/**").hasRole("ADMIN")
-					
+				.requestMatchers("/admin/**").hasAuthority("ADMIN")
+				.requestMatchers("/adminBook/**").hasAuthority("ADMIN")	
 				.requestMatchers("/").permitAll()
+				.requestMatchers("/payment/**").permitAll()
 				.anyRequest().authenticated()
 																												// others
-				)
+				)  
 
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint)
 				.accessDeniedHandler(accessDeniedHandler))

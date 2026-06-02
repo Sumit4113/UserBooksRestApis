@@ -2,9 +2,7 @@ package com.onlinebookstore.dto;
 
 import java.sql.Date;
 
-import java.util.UUID;
-
-public class BookDto {
+public class BookDtoRequest {
 
 	private String id;
 
@@ -25,34 +23,6 @@ public class BookDto {
 	private String mode;
 
 	private Date newDate;
-
-	private String bookImage;
-
-	private String bookPdf;
-
-	public String getBookImage() {
-		return bookImage;
-	}
-
-	public void setBookImage(String bookImage) {
-		this.bookImage = bookImage;
-	}
-
-	public String getBookPdf() {
-		return bookPdf;
-	}
-
-	public void setBookPdf(String bookPdf) {
-		this.bookPdf = bookPdf;
-	}
-
-	public Date getNewDate() {
-		return newDate;
-	}
-
-	public void setNewDate(Date newDate) {
-		this.newDate = newDate;
-	}
 
 	public String getId() {
 		return id;
@@ -110,14 +80,6 @@ public class BookDto {
 		this.price = price;
 	}
 
-	public String getMode() {
-		return mode;
-	}
-
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
-
 	public String getRating() {
 		return rating;
 	}
@@ -126,4 +88,22 @@ public class BookDto {
 		this.rating = rating;
 	}
 
+	public String getMode() {
+		return mode;
+	}
+
+	public void setMode(String mode) {
+		this.mode = mode;
+	}
+
+	public Date getNewDate() {
+		return newDate;
+	}
+
+	public void setNewDate(Date newDate) {
+		this.newDate = newDate;
+	}
+	
+	
+	
 }

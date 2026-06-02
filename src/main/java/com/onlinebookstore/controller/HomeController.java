@@ -19,28 +19,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.onlinebookstore.dto.BookDto;
 import com.onlinebookstore.entity.BookAdd;
+import com.onlinebookstore.repository.BookRepository;
 import com.onlinebookstore.service.BookService;
 
 @RestController
 @RequestMapping("/books")
-public class BookControler {
-	
-	
+public class HomeController {
 
 	@Autowired
 	private BookService bookService;
-
-	@PostMapping(value = "/addnew", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<BookDto> saveBook(
-	        @RequestParam("image") MultipartFile imageFile,
-	        @RequestParam("pdf") MultipartFile pdfFile,
-	        @ModelAttribute BookDto bookDto
-	)
-	{
-	    BookDto savedBook = bookService.saveBookMethod(bookDto, imageFile, pdfFile);
-	    return ResponseEntity.ok(savedBook);
-	}
-
+	
+	@Autowired
+	private BookRepository bookRepo;
 
 	@GetMapping("/getAllBooks")
 	public List<BookDto> getAllBooks() {
@@ -48,11 +38,22 @@ public class BookControler {
 		return bookService.getAllBooks();
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<BookDto> getBookById(@PathVariable UUID id) {
-	    BookDto	 book = bookService.getBookById(id);
-	    return ResponseEntity.ok(book);
+	@GetMapping("/search")
+	public ResponseEntity<List<BookDto>> searchBooks(@RequestParam String keyword) {
+
+		return ResponseEntity.ok(bookService.searchBooks(keyword));
 	}
 
+	@GetMapping("/{id}")
+	public ResponseEntity<BookDto> getBookById(@PathVariable UUID id) {
+		BookDto book = bookService.getBookById(id);
+		return ResponseEntity.ok(book);
+	}
+
+	@GetMapping("/genre/{genre}")
+	public List<BookAdd> getBooksByGenre(@PathVariable String genre) {
+
+		return bookRepo.findByGenreIgnoreCase(genre);
+	}
 
 }

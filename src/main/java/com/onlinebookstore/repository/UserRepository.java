@@ -18,5 +18,9 @@ public interface UserRepository extends JpaRepository<AppUser, UUID> {
 	public AppUser findByUserEmail(String userEmail);
 
 	public boolean existsByUserEmail(String string);
+	
+	List<AppUser> findTop5ByOrderByCreatedAtDesc();
+	
+	
 
 }

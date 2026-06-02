@@ -1,6 +1,7 @@
 package com.onlinebookstore.service;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import java.util.UUID;
@@ -9,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.onlinebookstore.customexception.ResourceNotFoundException;
 import com.onlinebookstore.dto.BookDto;
+import com.onlinebookstore.dto.BookDtoRequest;
 import com.onlinebookstore.entity.BookAdd;
 import com.onlinebookstore.repository.BookRepository;
 
@@ -21,7 +24,7 @@ public class BookService {
 	@Autowired
 	private BookRepository bookRepo;
 
-	public BookDto saveBookMethod(BookDto bookDto, MultipartFile imageFile, MultipartFile pdfFile) {
+	public BookDto saveBookMethod(BookDtoRequest bookDto, MultipartFile imageFile, MultipartFile pdfFile) {
 
 		BookAdd book = new BookAdd();
 
@@ -33,6 +36,7 @@ public class BookService {
 		book.setRating(bookDto.getRating());
 		book.setPublisher(bookDto.getPublisher());
 		book.setMode(bookDto.getMode());
+		book.setNewDate(bookDto.getNewDate());
 
 		try {
 			// ✅ Upload IMAGE to Cloudinary
@@ -74,11 +78,23 @@ public class BookService {
 
 	}
 
-	public BookDto getBookById(UUID id) {
-	    BookAdd book = bookRepo.findById(id)
-	        .orElseThrow(() -> new RuntimeException("Book not found"));
+	public List<BookDto> searchBooks(String keyword) {
 
-	    return mapToDto(book);  
+		List<BookAdd> books = bookRepo.findByTitleContainingIgnoreCase(keyword);
+
+		List<BookDto> result = new ArrayList<>();
+
+		for (BookAdd book : books) {
+			result.add(mapToDto(book));
+		}
+
+		return result;
+	}
+
+	public BookDto getBookById(UUID id) {
+		BookAdd book = bookRepo.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+
+		return mapToDto(book);
 	}
 
 	private BookDto mapToDto(BookAdd bookAdd) {
@@ -89,12 +105,20 @@ public class BookService {
 		dto.setPrice(bookAdd.getPrice());
 		dto.setPublisher(bookAdd.getPublisher());
 		dto.setGenre(bookAdd.getGenre());
-		dto.setBookImage(bookAdd.getBookImage());
-		dto.setPdf(bookAdd.getPdf());
 		dto.setRating(bookAdd.getRating());
 		dto.setDescription(bookAdd.getDescription());
 		dto.setMode(bookAdd.getMode());
+		dto.setNewDate(bookAdd.getNewDate());
+		dto.setBookImage(bookAdd.getBookImage());
+		dto.setBookPdf(bookAdd.getPdf());
+		
 		return dto;
+	}
+
+	public void deletebooks(UUID id) {
+		BookAdd book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+		bookRepo.delete(book);
 	}
 
 }
