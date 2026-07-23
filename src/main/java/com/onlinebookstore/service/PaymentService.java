@@ -1,6 +1,7 @@
 package com.onlinebookstore.service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.onlinebookstore.entity.AppUser;
 import com.onlinebookstore.entity.BookAdd;
 import com.onlinebookstore.entity.Payment;
 import com.onlinebookstore.entity.Purchase;
+import com.onlinebookstore.repository.BookRepository;
 import com.onlinebookstore.repository.PaymentRepository;
 import com.onlinebookstore.repository.PurchaseRepository;
 import com.onlinebookstore.repository.UserRepository;
@@ -16,49 +18,65 @@ import com.onlinebookstore.repository.UserRepository;
 @Service
 public class PaymentService {
 
-    @Autowired
-    private PaymentRepository paymentRepository;
+	@Autowired
+	private PaymentRepository paymentRepository;
 
-    @Autowired
-    private PurchaseRepository purchaseRepository;
+	@Autowired
+	private PurchaseRepository purchaseRepository;
 
-    public Payment createPayment(AppUser user, BookAdd book, String amount, String orderId) {
+	@Autowired
+	private UserRepository userRepository;
 
-    	
-    	
-        Payment payment = new Payment();
-        payment.setUser(user);
-        payment.setBook(book);
-        payment.setAmount(amount);
-        payment.setRazorpayOrderId(orderId);
-        payment.setPaymentStatus("PENDING");
-        payment.setPaymentDate(LocalDateTime.now());
+	@Autowired
+	private BookRepository bookRepo;
 
-        return paymentRepository.save(payment);
-    }
+	public Payment createPayment(AppUser user, BookAdd book, String amount, String orderId) {
 
-    public Payment updatePaymentSuccess(String orderId, String paymentId) {
+		Payment payment = new Payment();
+		payment.setUser(user);
+		payment.setBook(book);
+		payment.setAmount(amount);
+		payment.setRazorpayOrderId(orderId);
+		payment.setPaymentStatus("PENDING");
+		payment.setPaymentDate(LocalDateTime.now());
 
-        Payment payment = paymentRepository.findByRazorpayOrderId(orderId);
+		return paymentRepository.save(payment);
+	}
 
-        if (payment == null) {
-            throw new RuntimeException("Payment not found for orderId" + orderId);
-        }
+	public Payment updatePaymentSuccess(String orderId, String paymentId) {
 
-        payment.setRazorpayPaymentId(paymentId);
-        payment.setPaymentStatus("SUCCESS");
+		Payment payment = paymentRepository.findByRazorpayOrderId(orderId);
 
-        Payment saved = paymentRepository.save(payment);
+		if (payment == null) {
+			throw new RuntimeException("Payment not found for orderId" + orderId);
+		}
 
-        // 🔥 CREATE PURCHASE (THIS GIVES ACCESS)
-        Purchase purchase = new Purchase();
-        purchase.setUser(payment.getUser());
-        purchase.setBook(payment.getBook());
-        purchase.setPaymentId(paymentId);
-        purchase.setPurchasedAt(LocalDateTime.now());
+		payment.setRazorpayPaymentId(paymentId);
+		payment.setPaymentStatus("SUCCESS");
 
-        purchaseRepository.save(purchase);
+		Payment saved = paymentRepository.save(payment);
 
-        return saved;
-    }
+		// 🔥 CREATE PURCHASE (THIS GIVES ACCESS)
+		Purchase purchase = new Purchase();
+		purchase.setUser(payment.getUser());
+		purchase.setBook(payment.getBook());
+		purchase.setPaymentId(paymentId);
+		purchase.setPurchasedAt(LocalDateTime.now());
+
+		purchaseRepository.save(purchase);
+
+		return saved;
+	}
+
+	// Existing methods...
+
+	public boolean hasPurchased(UUID userId, UUID bookId) {
+
+		AppUser user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+		BookAdd book = bookRepo.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+
+		return purchaseRepository.existsByUserAndBook(user, book);
+	}
+
 }

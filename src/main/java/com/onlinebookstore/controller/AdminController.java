@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.onlinebookstore.dto.DashBoardActivity;
-import com.onlinebookstore.dto.UserRegisterRequest;
+import com.onlinebookstore.dto.UserRegisterRequestDto;
 import com.onlinebookstore.dto.UserResponseDTO;
 import com.onlinebookstore.entity.AppUser;
 import com.onlinebookstore.entity.Watchlist;
@@ -124,7 +124,7 @@ public class AdminController {
 
 	@PutMapping("/{id}")
 	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID id,
-			@RequestBody UserRegisterRequest userRequest, Authentication authenticate) {
+			@RequestBody UserRegisterRequestDto userRequest, Authentication authenticate) {
 		String loggedInEmail = authenticate.getName();
 		UserResponseDTO updatedUser = userService.updateUserByIdSecure(id, userRequest, loggedInEmail);
 

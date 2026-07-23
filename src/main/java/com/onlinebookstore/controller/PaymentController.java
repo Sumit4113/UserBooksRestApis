@@ -19,78 +19,71 @@ import com.onlinebookstore.dto.PaymentVerifyRequest;
 import com.onlinebookstore.entity.AppUser;
 import com.onlinebookstore.entity.BookAdd;
 import com.onlinebookstore.repository.BookRepository;
-import com.onlinebookstore.repository.PurchaseRepository;
+
 import com.onlinebookstore.repository.UserRepository;
 import com.onlinebookstore.service.PaymentService;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
 
-
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
 
-    @Value("${razorpay.key.id}")
-    private String keyId;
+	@Value("${razorpay.key.id}")
+	private String keyId;
 
-    @Value("${razorpay.key.secret}")
-    private String secret;
+	@Value("${razorpay.key.secret}")
+	private String secret;
 
-    @Autowired
-    private PaymentService paymentService;
+	@Autowired
+	private PaymentService paymentService;
 
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private BookRepository bookRepo;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private PurchaseRepository purchaseRepo;
-    
-    // STEP 1: Create Order
-    @PostMapping("/create-order")
-    public ResponseEntity<String> createOrder(@RequestBody PaymentRequest request) throws Exception {
+	@Autowired
+	private BookRepository bookRepo;
 
-        RazorpayClient client = new RazorpayClient(keyId, secret);
 
-        JSONObject object = new JSONObject();
-        object.put("amount", request.getAmount() * 100);
-        object.put("currency", "INR");
-        object.put("receipt", "txn_" + System.currentTimeMillis());
+	// STEP 1: Create Order
+	@PostMapping("/create-order")
+	public ResponseEntity<String> createOrder(@RequestBody PaymentRequest request) throws Exception {
 
-        Order order = client.orders.create(object);
+		RazorpayClient client = new RazorpayClient(keyId, secret);
 
-        AppUser user = userRepository.findById(request.getUserId()).orElseThrow();
-        BookAdd book = bookRepo.findById(request.getBookId()).orElseThrow();
+		JSONObject object = new JSONObject();
+		object.put("amount", request.getAmount() * 100);
+		object.put("currency", "INR");
+		object.put("receipt", "txn_" + System.currentTimeMillis());
 
-        paymentService.createPayment(user, book, String.valueOf(request.getAmount()), order.get("id"));
+		Order order = client.orders.create(object);
 
-        return ResponseEntity.ok(order.toString());
-    }
+		AppUser user = userRepository.findById(request.getUserId()).orElseThrow();
+		BookAdd book = bookRepo.findById(request.getBookId()).orElseThrow();
 
-    // STEP 2: VERIFY PAYMENT
-    @PostMapping("/verify")
-    public ResponseEntity<String> verifyPayment(@RequestBody PaymentVerifyRequest request) {
+		paymentService.createPayment(user, book, String.valueOf(request.getAmount()), order.get("id"));
 
-        paymentService.updatePaymentSuccess(
-                request.getRazorpayOrderId(),
-                request.getRazorpayPaymentId()
-        );
+		return ResponseEntity.ok(order.toString());
+	}
 
-        return ResponseEntity.ok("Payment Verified");
-    }
-    
-    @GetMapping("/purchase/check/{bookId}")
-    public ResponseEntity<Boolean> checkPurchase(
-            @PathVariable UUID bookId,
-            Authentication auth) {
+	// STEP 2: VERIFY PAYMENT
+	@PostMapping("/verify")
+	public ResponseEntity<String> verifyPayment(@RequestBody PaymentVerifyRequest request) {
 
-        AppUser user = userRepository.findByUserEmail(auth.getName());
-        BookAdd book = bookRepo.findById(bookId).orElseThrow();
+		paymentService.updatePaymentSuccess(request.getRazorpayOrderId(), request.getRazorpayPaymentId());
 
-        boolean isPurchased = purchaseRepo.existsByUserAndBook(user, book);
+		return ResponseEntity.ok("Payment Verified");
+	}
 
-        return ResponseEntity.ok(isPurchased);
-    }
+	@GetMapping("/purchase/check/{bookId}")
+	public ResponseEntity<Boolean> checkPurchase(@PathVariable UUID bookId, Authentication auth) {
+
+		System.out.println("Logged in user = " + auth.getName());
+
+		UUID userId = UUID.fromString(auth.getName());
+
+		boolean purchased = paymentService.hasPurchased(userId, bookId);
+
+		return ResponseEntity.ok(purchased);
+	}
 }

@@ -1,11 +1,12 @@
 package com.onlinebookstore.dto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class UserRegisterRequest {
+public class UserRegisterRequestDto {
 
 	private UUID userId;
 
@@ -17,6 +18,18 @@ public class UserRegisterRequest {
 	private String userEmail;
 	private String userRole;
 	private String userPassword;
+	
+	private LocalDateTime createdAt;
+	
+		
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
 	public String getUserPassword() {
 		return userPassword;

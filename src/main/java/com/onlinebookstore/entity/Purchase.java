@@ -11,19 +11,39 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Purchase {
 
-    @Id
-    @GeneratedValue
-    private UUID id;
+	@Id
+	@GeneratedValue
+	private UUID id;
 
-    @ManyToOne
-    private AppUser user;
+	@ManyToOne
+	private AppUser user;
 
-    @ManyToOne
-    private BookAdd book;
+	@ManyToOne
+	private BookAdd book;
 
-    private String paymentId;
+	private String paymentId;
 
-    private LocalDateTime purchasedAt;
+	private LocalDateTime purchasedAt;
+
+	private String orderId;
+
+	private String signature;
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
+	}
 
 	public UUID getId() {
 		return id;
@@ -64,6 +84,5 @@ public class Purchase {
 	public void setPurchasedAt(LocalDateTime purchasedAt) {
 		this.purchasedAt = purchasedAt;
 	}
-    
-    
+
 }

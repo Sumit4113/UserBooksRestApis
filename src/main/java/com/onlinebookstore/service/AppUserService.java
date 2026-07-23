@@ -1,5 +1,6 @@
 package com.onlinebookstore.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.onlinebookstore.customexception.ResourceNotFoundException;
-import com.onlinebookstore.dto.UserRegisterRequest;
+import com.onlinebookstore.dto.UserRegisterRequestDto;
 import com.onlinebookstore.dto.UserResponseDTO;
 import com.onlinebookstore.entity.AppUser;
 import com.onlinebookstore.repository.UserRepository;
@@ -25,7 +26,7 @@ public class AppUserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public UserResponseDTO createUser(UserRegisterRequest userRegister) {
+	public UserResponseDTO registerUser(UserRegisterRequestDto userRegister) {
 
 		if (userRegister.getUserEmail() == null || userRegister.getUserEmail().isBlank()) {
 
@@ -37,17 +38,9 @@ public class AppUserService {
 		user.setUserEmail(userRegister.getUserEmail());
 		user.setUserRole("USER");
 		user.setUserPassword(passwordEncoder.encode(userRegister.getUserPassword()));
-
+        user.setCreatedAt(LocalDateTime.now());
 		AppUser saved = userRepo.save(user);
 
-		// so this is used for map with user
-//		UserResponseDTO responseDto = new UserResponseDTO();
-//
-//		responseDto.setUserName(user.getUserName());
-//		responseDto.setUserEmail(user.getUserEmail());
-//		responseDto.setUserId(user.getUserId());
-//
-//		return responseDto;
 
 		return mapToResponse(saved);
 
@@ -56,8 +49,6 @@ public class AppUserService {
 	public List<UserResponseDTO> getAllUser() {
 
 		List<AppUser> users = userRepo.findAll();
-//   Java 8+ freature hai
-//		return user.stream().map(this::mapToResponse).toList();
 
 		List<UserResponseDTO> response = new ArrayList<UserResponseDTO>();
 
@@ -78,12 +69,12 @@ public class AppUserService {
 		return mapToResponse(user);
 	}
 
-	public UserResponseDTO updateUserByIdSecure(UUID id, UserRegisterRequest userRequest, String loggedInEmail)
+	public UserResponseDTO updateUserByIdSecure(UUID id, UserRegisterRequestDto userRequest, String loggedInEmail)
 			throws AccessDeniedException {
 
 		AppUser user = userRepo.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
-		// 🔐 Check if ADMIN
+		// Check if ADMIN
 		if (!isAdmin(loggedInEmail)) {
 
 			// USER can update ONLY their own account
@@ -124,31 +115,7 @@ public class AppUserService {
 		userRepo.delete(targetUser);
 	}
 
-	public UserResponseDTO userUpdate(UUID id, UserRegisterRequest request) {
-
-		AppUser user = userRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-		if (request.getUserName() != null && !request.getUserName().isBlank()) {
-
-			user.setUserName(request.getUserName());
-		}
-
-		if (request.getUserEmail() != null && !request.getUserEmail().isBlank()) {
-
-			user.setUserEmail(request.getUserEmail());
-		}
-
-		if (request.getUserPassword() != null && !request.getUserPassword().isBlank()) {
-
-			user.setUserPassword(passwordEncoder.encode(request.getUserPassword()));
-		}
-
-		AppUser updatedUser = userRepo.save(user);
-
-		return mapToResponse(updatedUser);
-
-	}
-
+	
 	public UserResponseDTO mapToResponse(AppUser user) {
 
 		UserResponseDTO userResponse = new UserResponseDTO();

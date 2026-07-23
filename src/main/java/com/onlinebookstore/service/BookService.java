@@ -1,5 +1,7 @@
 package com.onlinebookstore.service;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -120,5 +122,31 @@ public class BookService {
 
 		bookRepo.delete(book);
 	}
+	
+	public void pdfFile() {
+		
+	}
 
+	public byte[] loadPdf(BookAdd book) {
+
+	    try {
+
+	        URL url = new URL(book.getPdf());
+
+	        try (InputStream input = url.openStream()) {
+
+	            return input.readAllBytes();
+
+	        }
+
+	    }
+
+	    catch (Exception e) {
+
+	        throw new RuntimeException("Unable to load PDF", e);
+
+	    }
+
+	}
+	
 }

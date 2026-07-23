@@ -25,14 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.onlinebookstore.dto.LoginRequest;
 import com.onlinebookstore.dto.RefreshTokenRequest;
 import com.onlinebookstore.dto.TokenResponse;
-import com.onlinebookstore.dto.UserRegisterRequest;
+import com.onlinebookstore.dto.UserRegisterRequestDto;
 import com.onlinebookstore.dto.UserResponseDTO;
 import com.onlinebookstore.entity.AppUser;
 import com.onlinebookstore.entity.RefreshToken;
 import com.onlinebookstore.jwt.JwtService;
 import com.onlinebookstore.repository.RefreshTokenRepository;
 import com.onlinebookstore.repository.UserRepository;
-import com.onlinebookstore.service.AuthService;
+
 import com.onlinebookstore.service.CookieService;
 import com.onlinebookstore.service.AppUserService;
 
@@ -48,9 +48,6 @@ public class AuthController {
 
 	@Autowired
 	private AppUserService userService;
-
-	@Autowired
-	private AuthService authService;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -245,16 +242,18 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public UserResponseDTO register(@RequestBody UserRegisterRequest userRegister) {
+	public UserResponseDTO register(@RequestBody UserRegisterRequestDto userRegister) {
 
-		return authService.register(userRegister);
+		return userService.registerUser(userRegister);
 	}
 
 	@PutMapping("/update/{userId}")
 	public ResponseEntity<UserResponseDTO> updateUser(@PathVariable UUID userId,
-			@Valid @RequestBody UserRegisterRequest request) {
+			@Valid @RequestBody UserRegisterRequestDto request, Authentication authenitcation) {
 
-		UserResponseDTO userUpdated = userService.userUpdate(userId, request);
+		String loggedIn = authenitcation.getName();
+
+		UserResponseDTO userUpdated = userService.updateUserByIdSecure(userId, request, loggedIn);
 
 		return ResponseEntity.ok(userUpdated);
 	}
