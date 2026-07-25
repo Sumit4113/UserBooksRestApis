@@ -15,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -256,6 +257,15 @@ public class AuthController {
 		UserResponseDTO userUpdated = userService.updateUserByIdSecure(userId, request, loggedIn);
 
 		return ResponseEntity.ok(userUpdated);
+	}
+	
+	@GetMapping("/profile/{userId}")
+	public ResponseEntity<UserResponseDTO> getProfile(@PathVariable UUID userId) {
+
+	    System.out.println("Profile endpoint called");
+	    System.out.println(userId);
+
+	    return ResponseEntity.ok(userService.getUserById(userId));
 	}
 
 }
