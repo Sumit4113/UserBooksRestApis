@@ -35,8 +35,7 @@ public class BookAdd {
 	private String genre;
 	@Column
 	private String rating;
-	@Lob
-	@Column
+	@Column(columnDefinition = "TEXT")
 	private String description;
 	@Column
 	private String price;
