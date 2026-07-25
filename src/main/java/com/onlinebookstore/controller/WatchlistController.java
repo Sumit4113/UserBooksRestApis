@@ -3,6 +3,7 @@ package com.onlinebookstore.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.onlinebookstore.dto.BookDto;
 import com.onlinebookstore.entity.BookAdd;
 import com.onlinebookstore.service.WatchlistService;
 
@@ -26,7 +27,7 @@ public class WatchlistController {
     }
 
     @GetMapping
-    public List<BookAdd> getWatchlist(Principal principal) {
+    public List<BookDto> getWatchlist(Principal principal) {
 
         UUID userId = UUID.fromString(principal.getName());
 

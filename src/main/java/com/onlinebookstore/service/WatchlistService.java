@@ -3,6 +3,7 @@ package com.onlinebookstore.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.onlinebookstore.dto.BookDto;
 import com.onlinebookstore.entity.*;
 import com.onlinebookstore.repository.*;
 
@@ -20,6 +21,8 @@ public class WatchlistService {
 
     @Autowired
     private BookRepository bookRepo;
+    
+    private BookService bookService;
 
     public void addToWatchlist(UUID userId, UUID bookId) {
 
@@ -41,10 +44,23 @@ public class WatchlistService {
         watchlistRepo.save(w);
     }
 
-    public List<BookAdd> getUserWatchlist(UUID userId) {
-        return watchlistRepo.findByUser_UserId(userId)
-                .stream()
-                .map(Watchlist::getBook)
-                .toList();
+    public List<BookDto> getUserWatchlist(UUID userId) {
+    	return watchlistRepo.findByUser_UserId(userId)
+    	        .stream()
+    	        .map(Watchlist::getBook)
+    	        .map(this::mapToDto)
+    	        .toList();
+    }
+    
+    private BookDto mapToDto(BookAdd book) {
+
+        BookDto dto = new BookDto();
+
+        dto.setId(book.getBookId().toString());
+        dto.setTitle(book.getTitle());
+        dto.setAuthor(book.getAuthor());
+        dto.setBookImage(book.getBookImage());
+
+        return dto;
     }
 }

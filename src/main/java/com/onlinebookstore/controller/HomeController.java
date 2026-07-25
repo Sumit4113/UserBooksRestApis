@@ -53,9 +53,8 @@ public class HomeController {
 	}
 
 	@GetMapping("/genre/{genre}")
-	public List<BookAdd> getBooksByGenre(@PathVariable String genre) {
-
-		return bookRepo.findByGenreIgnoreCase(genre);
+	public List<BookDto> getBooksByGenre(@PathVariable String genre) {
+	    return bookService.getBooksByGenre(genre);
 	}
 
 	@GetMapping("/pdf/{id}")

@@ -123,9 +123,7 @@ public class BookService {
 		bookRepo.delete(book);
 	}
 	
-	public void pdfFile() {
-		
-	}
+	
 
 	public byte[] loadPdf(BookAdd book) {
 
@@ -147,6 +145,14 @@ public class BookService {
 
 	    }
 
+	}
+	
+	public List<BookDto> getBooksByGenre(String genre) {
+
+	    return bookRepo.findByGenreIgnoreCase(genre)
+	                   .stream()
+	                   .map(this::mapToDto)
+	                   .toList();
 	}
 	
 }
