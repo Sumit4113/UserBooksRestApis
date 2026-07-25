@@ -54,6 +54,7 @@ public class SpringConfiguration {
 				.requestMatchers("/adminBook/**").hasAuthority("ADMIN")	
 				.requestMatchers("/").permitAll()
 				.requestMatchers("/payment/**").permitAll()
+				.requestMatchers("/error").permitAll()
 				.anyRequest().authenticated()
 																												// others
 				)  

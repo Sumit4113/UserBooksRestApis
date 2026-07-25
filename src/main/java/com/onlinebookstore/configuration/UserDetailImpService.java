@@ -21,6 +21,10 @@ public class UserDetailImpService implements UserDetailsService {
 
 		AppUser user = userRepo.findByUserEmail(username);
 
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found: " + username);
+		}
+
 		CustomUserDetail userDetail = new CustomUserDetail(user);
 
 		return userDetail;
