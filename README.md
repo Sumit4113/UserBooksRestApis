@@ -2,7 +2,7 @@
 
 It's not completed yet , but i worked on that 
 but i deployed this project like backend on Render and frontend on vercel 
-here is the vercel live - <a href="https://onlinebookstorefrontend.vercel.app/" target="_blank">
+here is the vercel live - <a href="https://online-book-store-frontend-ten.vercel.app/" target="_blank">
   Live Demo
 </a>
 
