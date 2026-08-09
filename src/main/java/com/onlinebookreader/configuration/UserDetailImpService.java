@@ -1,0 +1,33 @@
+package com.onlinebookreader.configuration;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.onlinebookreader.entity.AppUser;
+import com.onlinebookreader.repository.UserRepository;
+
+@Service
+public class UserDetailImpService implements UserDetailsService {
+
+	@Autowired
+	private UserRepository userRepo;
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+		AppUser user = userRepo.findByUserEmail(username);
+
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found: " + username);
+		}
+
+		CustomUserDetail userDetail = new CustomUserDetail(user);
+
+		return userDetail;
+	}
+
+}
