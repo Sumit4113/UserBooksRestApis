@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,7 @@ public class BookService {
 	@Autowired
 	private BookRepository bookRepo;
 
+	@CacheEvict(value = { "books", "book", "searchBooks", "genreBooks" }, allEntries = true)
 	public BookDto saveBookMethod(BookDtoRequest bookDto, MultipartFile imageFile, MultipartFile pdfFile) {
 
 		BookAdd book = new BookAdd();
@@ -62,7 +65,10 @@ public class BookService {
 		return mapToDto(savedBook);
 	}
 
+	@Cacheable(value = "books", key = "'allBooks'")
 	public List<BookDto> getAllBooks() {
+
+		System.out.println("Fetching books from MySQL...");
 
 		List<BookAdd> bookAdd = bookRepo.findAll();
 
@@ -80,7 +86,10 @@ public class BookService {
 
 	}
 
+	@Cacheable(value = "searchBooks", key = "#keyword")
 	public List<BookDto> searchBooks(String keyword) {
+
+		System.out.println("Searching books from MySQL for: " + keyword);
 
 		List<BookAdd> books = bookRepo.findByTitleContainingIgnoreCase(keyword);
 
@@ -93,16 +102,52 @@ public class BookService {
 		return result;
 	}
 
+	@Cacheable(value = "book", key = "#id")
 	public BookDto getBookById(UUID id) {
 
-	    BookAdd book = bookRepo.findById(id)
-	            .orElseThrow(() ->
-	                new ResourceNotFoundException(
-	                    "Book not found with id: " + id
-	                )
-	            );
+		System.out.println("Fetching book from MySQL: " + id);
 
-	    return mapToDto(book);
+		BookAdd book = bookRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + id));
+
+		return mapToDto(book);
+	}
+
+	@CacheEvict(value = { "books", "book", "searchBooks", "genreBooks" }, allEntries = true)
+	public void deletebooks(UUID id) {
+		BookAdd book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
+
+		bookRepo.delete(book);
+	}
+
+	public byte[] loadPdf(BookAdd book) {
+
+		try {
+
+			URL url = new URL(book.getPdf());
+
+			try (InputStream input = url.openStream()) {
+
+				return input.readAllBytes();
+
+			}
+
+		}
+
+		catch (Exception e) {
+
+			throw new RuntimeException("Unable to load PDF", e);
+
+		}
+
+	}
+
+	@Cacheable(value = "genreBooks", key = "#genre")
+	public List<BookDto> getBooksByGenre(String genre) {
+
+		System.out.println("Fetching genre books from MySQL: " + genre);
+
+		return bookRepo.findByGenreIgnoreCase(genre).stream().map(this::mapToDto).toList();
 	}
 
 	private BookDto mapToDto(BookAdd bookAdd) {
@@ -119,46 +164,8 @@ public class BookService {
 		dto.setNewDate(bookAdd.getNewDate());
 		dto.setBookImage(bookAdd.getBookImage());
 		dto.setBookPdf(bookAdd.getPdf());
-		
+
 		return dto;
 	}
 
-	public void deletebooks(UUID id) {
-		BookAdd book = bookRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Book not found"));
-
-		bookRepo.delete(book);
-	}
-	
-	
-
-	public byte[] loadPdf(BookAdd book) {
-
-	    try {
-
-	        URL url = new URL(book.getPdf());
-
-	        try (InputStream input = url.openStream()) {
-
-	            return input.readAllBytes();
-
-	        }
-
-	    }
-
-	    catch (Exception e) {
-
-	        throw new RuntimeException("Unable to load PDF", e);
-
-	    }
-
-	}
-	
-	public List<BookDto> getBooksByGenre(String genre) {
-
-	    return bookRepo.findByGenreIgnoreCase(genre)
-	                   .stream()
-	                   .map(this::mapToDto)
-	                   .toList();
-	}
-	
 }

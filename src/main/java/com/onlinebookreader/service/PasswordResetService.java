@@ -1,11 +1,12 @@
 package com.onlinebookreader.service;
 
 import java.util.Calendar;
+
 import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,6 @@ import com.onlinebookreader.repository.UserRepository;
 @Service
 public class PasswordResetService {
 
-    private final BookService bookService;
-
-	private final PasswordEncoder passwordEncoder;
-
 	@Autowired
 	private UserRepository userRpo;
 
@@ -31,12 +28,7 @@ public class PasswordResetService {
 	private EmailService emailService;
 
 	@Autowired
-	private BCryptPasswordEncoder encoder;
-
-	PasswordResetService(PasswordEncoder passwordEncoder, BookService bookService) {
-		this.passwordEncoder = passwordEncoder;
-		this.bookService = bookService;
-	}
+	private PasswordEncoder encoder;
 
 	public void createPasswordResetToken(String email) {
 
@@ -89,12 +81,22 @@ public class PasswordResetService {
 
 		AppUser user = passwordReset.getUser();
 
-		user.setUserPassword(encoder.encode(newPassword));
+		String encodedPassword = encoder.encode(newPassword);
+
+		System.out.println("ENCODER CLASS = "
+		        + encoder.getClass().getName());
+
+		System.out.println("ENCODED NULL = "
+		        + (encodedPassword == null));
+
+		System.out.println("ENCODED LENGTH = "
+		        + (encodedPassword == null ? 0 : encodedPassword.length()));
+		
+		user.setUserPassword(encodedPassword);
 
 		userRpo.save(user);
-		
-		passwordResetRepository.delete(passwordReset);
 
+		passwordResetRepository.delete(passwordReset);
 	}
 
 }
