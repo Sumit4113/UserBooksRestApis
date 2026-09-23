@@ -68,7 +68,10 @@ onlinebookstore/
 
 ## 📸 Screenshots
 
-> _Add screenshots or GIFs here showing homepage, login, admin upload panel, etc._
+> <img width="1366" height="768" alt="Screenshot (36)" src="https://github.com/user-attachments/assets/3ae4087f-e337-44b1-966a-ea1f37996b52" />
+> <img width="1366" height="768" alt="Screenshot (37)" src="https://github.com/user-attachments/assets/84a3036b-4ba5-490c-bed5-0db97dec2c7f" />
+
+
 
 ---
 
