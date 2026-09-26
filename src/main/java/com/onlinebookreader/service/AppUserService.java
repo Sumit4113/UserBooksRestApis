@@ -20,14 +20,18 @@ import com.onlinebookreader.repository.UserRepository;
 @Service
 public class AppUserService {
 
-	@Autowired
 	private UserRepository userRepo;
 
-	@Autowired
 	private EmailService emailService;
 
-	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	public AppUserService(UserRepository userRepo, EmailService emailService, PasswordEncoder passwordEncoder) {
+		super();
+		this.userRepo = userRepo;
+		this.emailService = emailService;
+		this.passwordEncoder = passwordEncoder;
+	}
 
 	public UserResponseDTO registerUser(UserRegisterRequestDto userRegister) {
 
@@ -61,6 +65,35 @@ public class AppUserService {
 		}
 
 		return mapToResponse(saved);
+	}
+
+	public AppUser findGoogleEmail(String email, String name) {
+
+		AppUser existUser = userRepo.findByUserEmail(email);
+
+		if (existUser != null) {
+			return existUser;
+		}
+
+		AppUser user = new AppUser();
+
+		user.setUserEmail(email);
+		user.setUserName(name);
+		user.setUserRole("USER");
+		user.setUserPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+		user.setCreatedAt(LocalDateTime.now());
+
+		AppUser savedUser = userRepo.save(user);
+
+		try {
+			emailService.sendWelcomeEmail(savedUser.getUserEmail(), savedUser.getUserName());
+
+		} catch (Exception e) {
+			System.out.println("Faild to send an email :" + e.getMessage());
+		}
+
+		return savedUser;
+
 	}
 
 	public List<UserResponseDTO> getAllUser() {
@@ -106,7 +139,7 @@ public class AppUserService {
 			// ADMIN can update everything
 			user.setUserName(userRequest.getUserName());
 			user.setUserEmail(userRequest.getUserEmail());
-			user.setUserPassword(userRequest.getUserPassword());
+
 			user.setUserPassword(passwordEncoder.encode(userRequest.getUserPassword()));
 		}
 
@@ -116,27 +149,21 @@ public class AppUserService {
 
 	private boolean isAdmin(String email) {
 
-	    AppUser user = userRepo.findByUserEmail(email);
+		AppUser user = userRepo.findByUserEmail(email);
 
-	    if (user == null) {
-	        throw new ResourceNotFoundException(
-	                "User not found with email: " + email
-	        );
-	    }
+		if (user == null) {
+			throw new ResourceNotFoundException("User not found with email: " + email);
+		}
 
-	    return "ROLE_ADMIN".equals(user.getUserRole());
+		return "ROLE_ADMIN".equals(user.getUserRole());
 	}
 
 	public void deleteUserById(UUID id) {
 
-	    AppUser targetUser = userRepo.findById(id)
-	            .orElseThrow(() ->
-	                new ResourceNotFoundException(
-	                    "User not found with id: " + id
-	                )
-	            );
+		AppUser targetUser = userRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 
-	    userRepo.delete(targetUser);
+		userRepo.delete(targetUser);
 	}
 
 	public UserResponseDTO mapToResponse(AppUser user) {
